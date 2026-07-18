@@ -1,0 +1,7 @@
+package com.mockmate.resume;
+import com.mockmate.user.*; import java.io.IOException; import java.nio.file.*; import java.util.UUID; import org.springframework.beans.factory.annotation.Value; import org.springframework.http.HttpStatus; import org.springframework.security.core.Authentication; import org.springframework.web.bind.annotation.*; import org.springframework.web.multipart.MultipartFile;
+@RestController @RequestMapping("/api/resume") public class ResumeController {
+ private final UserRepository users; private final Path root;
+ ResumeController(UserRepository u,@Value("${app.upload-dir}") String dir){users=u;root=Paths.get(dir).toAbsolutePath().normalize();}
+ @PostMapping(consumes="multipart/form-data") @ResponseStatus(HttpStatus.CREATED) UploadResponse upload(@RequestParam("file") MultipartFile file,Authentication a)throws IOException {if(file.isEmpty())throw new IllegalArgumentException("Please select a file");String n=file.getOriginalFilename();if(n==null||!(n.endsWith(".pdf")||n.endsWith(".docx")))throw new IllegalArgumentException("Only PDF and DOCX files are supported");Files.createDirectories(root);String stored=UUID.randomUUID()+n.substring(n.lastIndexOf('.'));Files.copy(file.getInputStream(),root.resolve(stored),StandardCopyOption.REPLACE_EXISTING);User u=users.findByEmail(a.getName()).orElseThrow();u.setResumePath(stored);users.save(u);return new UploadResponse(stored,"Resume uploaded successfully");} record UploadResponse(String fileName,String message){}
+}

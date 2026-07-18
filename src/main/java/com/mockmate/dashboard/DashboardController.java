@@ -1,0 +1,7 @@
+package com.mockmate.dashboard;
+import com.mockmate.interview.*; import com.mockmate.user.*; import java.util.*; import org.springframework.security.core.Authentication; import org.springframework.web.bind.annotation.*;
+@RestController @RequestMapping("/api/dashboard") public class DashboardController {
+ private final UserRepository users; private final InterviewRepository interviews; DashboardController(UserRepository u,InterviewRepository i){users=u;interviews=i;}
+ @GetMapping Summary summary(Authentication a){User u=users.findByEmail(a.getName()).orElseThrow();List<Interview> all=interviews.findByUserOrderByCreatedAtDesc(u);List<Interview> done=all.stream().filter(i->"COMPLETED".equals(i.getStatus())).toList();double avg=done.stream().mapToInt(i->i.getScore()).average().orElse(0);Map<InterviewType,Double> byType=new EnumMap<>(InterviewType.class);for(InterviewType t:InterviewType.values())byType.put(t,done.stream().filter(i->i.getType()==t).mapToInt(i->i.getScore()).average().orElse(0));return new Summary(all.size(),done.size(),Math.round(avg*10.0)/10.0,byType,done.stream().limit(5).map(i->new Recent(i.getId(),i.getType(),i.getScore(),i.getCreatedAt())).toList());}
+ record Summary(int totalInterviews,int completedInterviews,double averageScore,Map<InterviewType,Double> scoresByType,List<Recent> recent){} record Recent(Long id,InterviewType type,Integer score,java.time.Instant createdAt){}
+}
