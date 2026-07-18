@@ -8,4 +8,4 @@ spring:
     hibernate.ddl-auto: create-drop
     open-in-view: false
 server:
-  port: 8081
+  port: ${PORT:8081}

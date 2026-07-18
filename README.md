@@ -44,3 +44,10 @@ Use `POST /api/resume` with multipart field name `file` to upload a PDF or DOCX.
 - Move uploaded files to object storage (S3, Azure Blob, etc.) and virus-scan them.
 - Add rate limits, refresh tokens, password reset/email verification, and ownership audit logs.
 - Speech-to-text is best implemented in the React client with the browser Web Speech API, sending its transcript to the existing answer endpoint.
+
+## Public deployment
+
+1. Create a Render web service from this repository. Render detects `render.yaml`; deploy the API using Docker.
+2. After Render gives an API URL, set `APP_CORS_ALLOWED_ORIGINS` to your Vercel URL, e.g. `https://mockmate.vercel.app`.
+3. Import this same GitHub repository into Vercel, set **Root Directory** to `frontend`, and set `VITE_API_URL` to `https://<your-render-service>.onrender.com/api`.
+4. Redeploy both services. For persistent user accounts and interview history, replace the development H2 database with a managed MySQL database by setting `SPRING_PROFILES_ACTIVE` and the `DB_*` variables in the API host.

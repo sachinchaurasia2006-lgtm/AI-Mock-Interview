@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: mockmate-api
+    runtime: docker
+    plan: free
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: dev
+      - key: JWT_SECRET
+        generateValue: true
+      - key: APP_CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: OPENAI_ENABLED
+        value: false
+      - key: OPENAI_API_KEY
+        sync: false
