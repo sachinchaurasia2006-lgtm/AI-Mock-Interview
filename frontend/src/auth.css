@@ -1,0 +1,12 @@
+.password-wrap { position: relative; }
+.password-wrap input { padding-right: 64px; }
+.password-toggle { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); padding: 5px 7px; background: transparent; color: var(--signal); font: 700 10px 'DM Mono'; letter-spacing: .05em; }
+.notice { display: block; margin-bottom: 15px; color: var(--signal); background: rgba(37, 168, 125, 0.1); border-left: 3px solid var(--signal); padding: 10px 14px; border-radius: 2px; line-height: 1.5; word-break: break-word; font-size: 12px; }
+.auth-card .forgot-link { margin: 14px 0 0; }
+.resend-container { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; margin-bottom: 15px; font-size: 11px; }
+.resend-container span { color: var(--muted); font: 500 11px 'DM Mono'; }
+.resend-btn { background: none; color: var(--signal); font: 700 11px 'DM Mono'; letter-spacing: .04em; padding: 4px 6px; border: 1px solid currentColor; border-radius: 2px; transition: all .2s; }
+.resend-btn:hover:not(:disabled) { background: var(--signal); color: #fff; }
+.resend-btn:disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--muted); color: var(--muted); }
+.dev-token-badge { margin: 8px 0 12px; padding: 8px 10px; background: #152423; border: 1px dashed var(--signal); border-radius: 2px; font: 500 11px 'DM Mono'; color: #a4ecd2; word-break: break-all; }
+.auth-actions-group { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
