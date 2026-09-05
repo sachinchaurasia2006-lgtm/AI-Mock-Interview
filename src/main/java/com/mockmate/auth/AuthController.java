@@ -23,14 +23,16 @@ public class AuthController {
   private final JwtService jwt;
   private final PasswordResetTokenRepository resetTokens;
   private final EmailService emailService;
+  private final OAuthService oauthService;
   private final boolean exposeDevelopmentToken;
 
-  public AuthController(UserRepository users, PasswordEncoder encoder, JwtService jwt, PasswordResetTokenRepository resetTokens, EmailService emailService, @Value("${app.password-reset.expose-development-token:false}") boolean exposeDevelopmentToken) {
+  public AuthController(UserRepository users, PasswordEncoder encoder, JwtService jwt, PasswordResetTokenRepository resetTokens, EmailService emailService, OAuthService oauthService, @Value("${app.password-reset.expose-development-token:false}") boolean exposeDevelopmentToken) {
     this.users = users;
     this.encoder = encoder;
     this.jwt = jwt;
     this.resetTokens = resetTokens;
     this.emailService = emailService;
+    this.oauthService = oauthService;
     this.exposeDevelopmentToken = exposeDevelopmentToken;
   }
 
@@ -126,6 +128,16 @@ public class AuthController {
     } catch (NoSuchAlgorithmException e) {
       throw new IllegalStateException(e);
     }
+  }
+
+  @GetMapping("/oauth/config")
+  public OAuthService.OAuthConfigResponse getOAuthConfig() {
+    return oauthService.getConfig();
+  }
+
+  @PostMapping("/oauth/github")
+  public AuthResponse authenticateGithub(@RequestBody OAuthService.OAuthExchangeRequest req) {
+    return oauthService.authenticateGithub(req.code(), req.redirectUri());
   }
 
   public record RegisterRequest(@NotBlank String name, @Email String email, @Size(min = 8, message = "Password must be at least 8 characters") String password) {}

@@ -27,3 +27,7 @@ services:
         sync: false
       - key: APP_PASSWORD_RESET_FRONTEND_URL
         value: "https://sachinworks.in"
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false

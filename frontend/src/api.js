@@ -1,12 +1,12 @@
 const configuredApi = import.meta.env.VITE_API_URL?.trim()
 const productionApi = 'https://ai-mock-interview-gz51.onrender.com/api'
+const developmentApi = 'http://localhost:8081/api'
 
-// Ignore the setup placeholder accidentally used by the hosted frontend.
-// This keeps production requests pointed at the live API until Vercel has a
-// real VITE_API_URL configured.
+// In development, default to local backend unless explicitly overridden.
+// In production, fallback to Render API if VITE_API_URL is not set or is placeholder.
 const API = configuredApi && !configuredApi.includes('YOUR-RENDER-SERVICE')
   ? configuredApi.replace(/\/$/, '')
-  : productionApi
+  : (import.meta.env.DEV ? developmentApi : productionApi)
 
 export const token = () => localStorage.getItem('mockmate_token')
 export const request = async (path, options = {}) => {
