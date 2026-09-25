@@ -689,6 +689,107 @@ const TechTrustStrip = () => (
   </div>
 )
 
+const FigmaBentoGrid = ({ onExplore }) => (
+  <div className="figma-bento-section">
+    <div className="figma-bento-header">
+      <span className="eyebrow">ENGINEERING PLATFORM SUITE</span>
+      <h2>Architected for Elite Interview Readiness</h2>
+      <p>
+        Every simulation combines multi-modal AI feedback, STAR rubric extraction, and architectural trade-off synthesis to transform preparation into unshakeable leadership poise.
+      </p>
+    </div>
+
+    <div className="figma-bento-grid">
+      {/* Card 1: Live Voice & Speech AI */}
+      <div className="bento-card bento-card-large bento-card-glow-purple" onClick={onExplore} style={{ cursor: 'pointer' }}>
+        <div className="bento-card-top">
+          <span className="bento-pill-tag purple">🎙️ SPEECH INTELLIGENCE</span>
+          <span className="bento-latency-pill">⚡ 1.2s Real-Time Latency</span>
+        </div>
+        <h3>Real-Time Speech Synthesis & Tone Analysis</h3>
+        <p>
+          Practice answering aloud with browser text-to-speech auto-narration and speech recognition. Receive pacing feedback and filler-word detection.
+        </p>
+        <div className="bento-visual-speech">
+          <div className="bento-audio-bars">
+            {[40, 75, 55, 90, 60, 100, 80, 45, 70, 95, 65, 85, 50, 90, 70, 40].map((h, i) => (
+              <span key={i} className="bento-wave-bar" style={{ height: `${h}%`, animationDelay: `${i * 0.08}s` }} />
+            ))}
+          </div>
+          <div className="bento-speech-badge">
+            <span className="bento-dot-pulse" />
+            <span>Voice AI Active • 120 WPM Optimal Cadence</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Card 2: STAR Rubric Engine */}
+      <div className="bento-card bento-card-medium bento-card-glow-cyan" onClick={onExplore} style={{ cursor: 'pointer' }}>
+        <div className="bento-card-top">
+          <span className="bento-pill-tag cyan">📊 STAR METHODOLOGY</span>
+          <span className="bento-score-pill">4D Rubric</span>
+        </div>
+        <h3>Automated STAR Structure Extraction</h3>
+        <p>
+          Heuristic detection instantly parses your Situation, Task, Action, and Result so you never leave out critical business impact metrics.
+        </p>
+        <div className="bento-star-chips-row">
+          <span className="bento-star-chip">✓ S: Situation</span>
+          <span className="bento-star-chip">✓ T: Task</span>
+          <span className="bento-star-chip">✓ A: Action</span>
+          <span className="bento-star-chip">✓ R: Result</span>
+        </div>
+      </div>
+
+      {/* Card 3: Dual IDE Code Scratchpad */}
+      <div className="bento-card bento-card-medium bento-card-glow-pink" onClick={onExplore} style={{ cursor: 'pointer' }}>
+        <div className="bento-card-top">
+          <span className="bento-pill-tag pink">💻 DUAL-MODE IDE</span>
+          <span className="bento-badge-mono">Java • TS • SQL</span>
+        </div>
+        <h3>Live Code & Architecture Scratchpad</h3>
+        <p>
+          Seamlessly toggle between conversational responses and technical code blocks with monospace syntax formatting and tab indentation.
+        </p>
+        <div className="bento-code-snippet">
+          <code>
+            <span className="code-kw">public</span> <span className="code-type">ConcurrentMap</span> <span className="code-fn">createCache</span>() &#123;<br />
+            &nbsp;&nbsp;<span className="code-kw">return</span> <span className="code-kw">new</span> <span className="code-type">ConcurrentHashMap</span>&lt;&gt;();<br />
+            &#125;
+          </code>
+        </div>
+      </div>
+
+      {/* Card 4: Executive Certification */}
+      <div className="bento-card bento-card-small bento-card-glow-amber" onClick={onExplore} style={{ cursor: 'pointer' }}>
+        <div className="bento-card-top">
+          <span className="bento-pill-tag amber">🏆 CERTIFICATION</span>
+        </div>
+        <h4>Executive Verified Credential</h4>
+        <p>Earn official readiness credentials with cryptographic verification codes for LinkedIn or hiring managers.</p>
+        <div className="bento-seal-preview">
+          <span className="bento-seal-badge">★ VERIFIED EXECUTIVE READINESS ★</span>
+        </div>
+      </div>
+
+      {/* Card 5: Resume AI Calibration */}
+      <div className="bento-card bento-card-small bento-card-glow-emerald" onClick={onExplore} style={{ cursor: 'pointer' }}>
+        <div className="bento-card-top">
+          <span className="bento-pill-tag emerald">📄 RESUME AI</span>
+        </div>
+        <h4>Tailored Stack Alignment</h4>
+        <p>Ingests your resume bullets to craft questions specific to your exact tools and tenure.</p>
+        <div className="bento-skill-tags-row">
+          <span>Spring Boot</span>
+          <span>Kafka</span>
+          <span>Redis</span>
+          <span>AWS</span>
+        </div>
+      </div>
+    </div>
+  </div>
+)
+
 const LandingDemoTeaser = ({ onTrySample }) => {
   const [activeTab, setActiveTab] = useState('behavioral')
   const current = SAMPLE_DEMOS.find((d) => d.key === activeTab) || SAMPLE_DEMOS[0]
@@ -1095,6 +1196,11 @@ export default function App() {
           </nav>
 
           <div className="header-tools">
+            <span className="system-status-badge">
+              <span className="status-dot-pulse" />
+              AI Core Online
+            </span>
+
             <button
               type="button"
               className="icon-action-btn"
@@ -1750,6 +1856,13 @@ function Auth({ onSuccess }) {
 
       <section className="landing-extra-section">
         <TechTrustStrip />
+        <FigmaBentoGrid
+          onExplore={() => {
+            sfx.click()
+            setMode('register')
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          }}
+        />
         <LandingDemoTeaser
           onTrySample={() => {
             sfx.click()
