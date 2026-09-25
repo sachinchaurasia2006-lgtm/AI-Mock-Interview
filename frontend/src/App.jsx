@@ -450,6 +450,429 @@ const CameraPreview = () => {
   )
 }
 
+// 4-Dimensional Competency Radar Chart
+const CompetencyRadarChart = ({ score = 50, scoresByType = {} }) => {
+  const avg = score || 45
+  const dsa = scoresByType['DSA'] || Math.max(30, Math.round(avg * 0.95))
+  const tech = scoresByType['TECHNICAL'] || Math.max(30, Math.round(avg * 1.05))
+  const hr = scoresByType['HR'] || Math.max(35, Math.round(avg * 0.9))
+  const java = scoresByType['JAVA'] || Math.max(25, Math.round(avg * 1.0))
+
+  const cx = 90, cy = 90, r = 58
+  const pTop = [cx, cy - (r * Math.min(100, Math.max(20, tech))) / 100]
+  const pRight = [cx + (r * Math.min(100, Math.max(20, hr))) / 100, cy]
+  const pBottom = [cx, cy + (r * Math.min(100, Math.max(20, java))) / 100]
+  const pLeft = [cx - (r * Math.min(100, Math.max(20, dsa))) / 100, cy]
+
+  const polygonPoints = `${pTop[0]},${pTop[1]} ${pRight[0]},${pRight[1]} ${pBottom[0]},${pBottom[1]} ${pLeft[0]},${pLeft[1]}`
+
+  return (
+    <div className="radar-widget-card">
+      <div className="widget-top-title">
+        <span>COMPETENCY RADAR MATRIX</span>
+        <span className="live-ticker-badge"><span className="live-ticker-dot" /> 4 Calibrations</span>
+      </div>
+      <div className="radar-graphic-wrap">
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          <defs>
+            <radialGradient id="radarFill" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.15" />
+            </radialGradient>
+          </defs>
+          {[0.33, 0.66, 1].map((scale, idx) => (
+            <circle
+              key={idx}
+              cx={cx}
+              cy={cy}
+              r={r * scale}
+              fill="none"
+              stroke="rgba(255,255,255,0.08)"
+              strokeDasharray={scale === 1 ? undefined : "3 3"}
+            />
+          ))}
+          <line x1={cx} y1={cy - r} x2={cx} y2={cy + r} stroke="rgba(255,255,255,0.12)" />
+          <line x1={cx - r} y1={cy} x2={cx + r} y2={cy} stroke="rgba(255,255,255,0.12)" />
+
+          <polygon
+            points={polygonPoints}
+            fill="url(#radarFill)"
+            stroke="#8b5cf6"
+            strokeWidth="2.2"
+          />
+
+          {[pTop, pRight, pBottom, pLeft].map(([x, y], idx) => (
+            <circle key={idx} cx={x} cy={y} r="3.5" fill="#06b6d4" stroke="#fff" strokeWidth="1" />
+          ))}
+
+          <text x={cx} y="18" textAnchor="middle" fill="#94a3b8" fontSize="9.5" fontFamily="var(--font-mono)" fontWeight="700">SYSTEM</text>
+          <text x="175" y={cy + 3} textAnchor="end" fill="#94a3b8" fontSize="9.5" fontFamily="var(--font-mono)" fontWeight="700">STAR/HR</text>
+          <text x={cx} y="172" textAnchor="middle" fill="#94a3b8" fontSize="9.5" fontFamily="var(--font-mono)" fontWeight="700">JAVA</text>
+          <text x="6" y={cy + 3} textAnchor="start" fill="#94a3b8" fontSize="9.5" fontFamily="var(--font-mono)" fontWeight="700">DSA</text>
+        </svg>
+      </div>
+      <div className="radar-legend-chips">
+        <span className="radar-legend-pill"><span className="legend-dot" style={{ background: '#8b5cf6' }} /> Architecture: {tech}%</span>
+        <span className="radar-legend-pill"><span className="legend-dot" style={{ background: '#ec4899' }} /> STAR EQ: {hr}%</span>
+        <span className="radar-legend-pill"><span className="legend-dot" style={{ background: '#06b6d4' }} /> DSA/Speed: {dsa}%</span>
+      </div>
+    </div>
+  )
+}
+
+// 7-Day Habit Streak Tracker
+const HabitStreakCard = ({ completedCount = 0, onQuickDrill }) => {
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  const todayIdx = (new Date().getDay() + 6) % 7
+  const streak = Math.max(1, Math.min(7, completedCount ? (completedCount % 7 || 3) : 1))
+
+  return (
+    <div className="habit-streak-card">
+      <div className="streak-header-hero">
+        <span className="streak-flame-icon">🔥</span>
+        <div className="streak-hero-text">
+          <h3>{streak}-Day Calibration Streak</h3>
+          <p>Daily micro-rehearsals build unshakeable composure under intense technical rounds.</p>
+        </div>
+      </div>
+      <div className="streak-days-container">
+        {days.map((d, i) => {
+          const isDone = i < streak
+          const isToday = i === todayIdx
+          return (
+            <div key={d} className={`streak-day-cell ${isDone ? 'completed' : ''} ${isToday ? 'today' : ''}`}>
+              <span className="day-name">{d}</span>
+              <span className="day-status-icon">{isDone ? '✓' : isToday ? '🎯' : '○'}</span>
+            </div>
+          )
+        })}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
+        <small style={{ color: 'var(--text-muted)', fontSize: 12 }}>
+          {completedCount > 0 ? `${completedCount} total sets completed` : 'Complete today to extend your streak'}
+        </small>
+        <button className="text-link" onClick={onQuickDrill}>
+          1-min drill →
+        </button>
+      </div>
+    </div>
+  )
+}
+
+const COMPANY_PACKS = [
+  {
+    id: 'faang',
+    tag: 'FAANG TIER',
+    title: 'FAANG Leadership & STAR Strategy',
+    desc: 'Amazon Leadership Principles, Google Googlyness & Meta conflict handling under pressure.',
+    track: 'HR',
+    role: 'Senior Software Engineer (FAANG Track)',
+    count: 3,
+  },
+  {
+    id: 'fintech',
+    tag: 'FINTECH & HFT',
+    title: 'Low-Latency & Concurrency',
+    desc: 'Lock-free queues, memory barriers, thread safety & distributed transactions.',
+    track: 'TECHNICAL',
+    role: 'Distributed Systems & Concurrency Engineer',
+    count: 3,
+  },
+  {
+    id: 'java-deep',
+    tag: 'ENTERPRISE JAVA',
+    title: 'JVM Internals & Spring Boot Architect',
+    desc: 'Garbage collection tuning, memory leaks, Spring transactional boundaries & Kafka streams.',
+    track: 'JAVA',
+    role: 'Senior Java Spring Boot Architect',
+    count: 3,
+  },
+  {
+    id: 'dsa-speed',
+    tag: 'ALGORITHMS',
+    title: 'High-Impact Algorithmic Patterns',
+    desc: 'Sliding window, dynamic programming, monotonic stacks & graph traversals.',
+    track: 'DSA',
+    role: 'Algorithmic Problem Solving Specialist',
+    count: 3,
+  },
+]
+
+const CompanyPrepPacks = ({ onSelectPack }) => (
+  <div className="company-packs-section">
+    <div className="company-packs-header">
+      <span className="subhead-pill">TARGET PREPARATION PRESETS</span>
+      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, marginTop: 4 }}>
+        Calibrated Company Archetypes
+      </h2>
+      <p style={{ color: 'var(--text-muted)', fontSize: 13.5, marginTop: 4 }}>
+        One-click launch realistic interview scenarios tuned to specific industry hiring bars.
+      </p>
+    </div>
+    <div className="company-packs-grid">
+      {COMPANY_PACKS.map((pack) => (
+        <div
+          key={pack.id}
+          className="company-pack-card"
+          onClick={() => {
+            sfx.click()
+            onSelectPack(pack.track, pack.role, pack.count)
+          }}
+        >
+          <div>
+            <span className="pack-tag-pill">{pack.tag}</span>
+            <h4>{pack.title}</h4>
+            <p>{pack.desc}</p>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent-cyan)' }}>{pack.count} Questions</span>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-main)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              Launch Pack →
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)
+
+const SAMPLE_DEMOS = [
+  {
+    key: 'behavioral',
+    badge: 'STAR LEADERSHIP',
+    title: 'High-Stakes Outage Resolution',
+    question: 'Tell me about a time you handled a critical production incident under high leadership pressure.',
+    answer: 'At my previous role, during a Black Friday traffic surge, our payment gateway began throwing 504 timeouts (Situation). My task was to restore checkout within 10 minutes without dropping transactions (Task). I quickly enabled our distributed fallback circuit breaker, redirected checkout traffic to our asynchronous queuing buffer, and hot-patched the connection pool leak (Action). This restored 100% throughput within 6 minutes and prevented $85,000 in lost revenue (Result).',
+    score: 92,
+    feedback: 'Superb adherence to STAR structure. Concrete latency metrics and dollar-value outcomes demonstrate high engineering ownership.',
+  },
+  {
+    key: 'sysdesign',
+    badge: 'SYSTEM DESIGN',
+    title: '100k Writes/Sec Rate Limiter',
+    question: 'How would you architect a distributed rate-limiter handling 100,000 requests/sec with sub-5ms latency?',
+    answer: 'I would utilize a Sliding Window Log with Redis Cluster and Lua scripts for atomic increments (Architecture). The objective is sub-5ms latency and zero race conditions under concurrent writes (Task). I deploy local in-memory token buckets on edge Envoy proxies for 95% of traffic, sync asynchronously to Redis via token refill batches, and gracefully degrade during partition (Action). This achieves 2.4ms P99 latency while maintaining strict tier limits (Result).',
+    score: 94,
+    feedback: 'Excellent trade-off articulation between edge latency vs global consistency with Redis Lua script concurrency.',
+  },
+  {
+    key: 'java',
+    badge: 'JAVA INTERNALS',
+    title: 'ConcurrentHashMap & Lock Striping',
+    question: 'Explain how ConcurrentHashMap achieves thread-safety in Java 8+ without global synchronized locks.',
+    answer: 'In Java 8, ConcurrentHashMap replaced segment locks with fine-grained CAS (Compare-And-Swap) operations and synchronized blocks on individual bucket node heads (Situation). The task is maximizing parallel read/write concurrency without global table locks (Task). Reads remain completely lock-free using volatile Node values, while writes lock only the specific collision bucket root during tree bin transformation (Action). This scales throughput linearly across all CPU cores (Result).',
+    score: 96,
+    feedback: 'Deep JVM knowledge. Clear explanation of CAS vs synchronized bucket locking and lock-free volatile reads.',
+  },
+]
+
+const TechTrustStrip = () => (
+  <div className="tech-trust-strip">
+    <div className="trust-label">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </svg>
+      <span>Calibrated for Hiring Bars At</span>
+    </div>
+    <div className="trust-logos-row">
+      <span className="trust-logo-pill">Google</span>
+      <span className="trust-logo-pill">Amazon</span>
+      <span className="trust-logo-pill">Meta</span>
+      <span className="trust-logo-pill">Stripe</span>
+      <span className="trust-logo-pill">Netflix</span>
+      <span className="trust-logo-pill">Microsoft</span>
+    </div>
+    <div className="live-ticker-badge">
+      <span className="live-ticker-dot" />
+      <span>14,800+ Mock Sets Calibrated</span>
+    </div>
+  </div>
+)
+
+const LandingDemoTeaser = ({ onTrySample }) => {
+  const [activeTab, setActiveTab] = useState('behavioral')
+  const current = SAMPLE_DEMOS.find((d) => d.key === activeTab) || SAMPLE_DEMOS[0]
+
+  return (
+    <div className="landing-demo-card">
+      <div className="demo-card-header">
+        <div className="demo-title-group">
+          <span className="eyebrow">INTERACTIVE PREVIEW</span>
+          <h3>Experience Live AI Interview Evaluation</h3>
+        </div>
+        <div className="demo-tabs-row">
+          {SAMPLE_DEMOS.map((d) => (
+            <button
+              key={d.key}
+              type="button"
+              className={`demo-tab-btn ${activeTab === d.key ? 'active' : ''}`}
+              onClick={() => { sfx.click(); setActiveTab(d.key) }}
+            >
+              {d.badge}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="demo-content-grid">
+        <div className="demo-panel-box">
+          <div>
+            <span className="demo-q-badge">SAMPLE QUESTION</span>
+            <div className="demo-question-text">{current.question}</div>
+          </div>
+          <div>
+            <span className="demo-q-badge" style={{ color: 'var(--primary)' }}>SAMPLE CANDIDATE TRANSCRIPT</span>
+            <div className="demo-sample-answer">"{current.answer}"</div>
+          </div>
+          <StarDetector text={current.answer} />
+        </div>
+
+        <div className="demo-eval-box">
+          <div className="demo-score-header">
+            <div>
+              <span className="demo-q-badge" style={{ color: 'var(--accent-emerald)' }}>AI CALIBRATION SCORE</span>
+              <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>4-Dimension Rubric Evaluation</span>
+            </div>
+            <div className="demo-score-val">{current.score} <small style={{ fontSize: 14, color: 'var(--text-faint)' }}>/100</small></div>
+          </div>
+
+          <p style={{ fontSize: 13, color: '#e2e8f0', lineHeight: 1.5, background: 'rgba(255,255,255,0.03)', padding: 12, borderRadius: 10 }}>
+            {current.feedback}
+          </p>
+
+          <RubricBarGrid score={current.score} answer={current.answer} />
+
+          <button
+            className="primary-glow-btn wide"
+            style={{ marginTop: 10 }}
+            onClick={() => onTrySample(current)}
+          >
+            <span>Practice Live With AI Like This</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: 16, height: 16 }}>
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Global Command Palette Modal (Ctrl+K / Cmd+K)
+const CommandPalette = ({ isOpen, onClose, onSelectAction }) => {
+  const [search, setSearch] = useState('')
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      setSearch('')
+      setSelectedIndex(0)
+      setTimeout(() => inputRef.current?.focus(), 60)
+    }
+  }, [isOpen])
+
+  const actions = [
+    { id: 'track-hr', group: 'SIMULATION TRACKS', title: 'Launch HR & Behavioral Mock', badge: 'STAR Method', icon: '🎤', action: () => onSelectAction('start-track', 'HR') },
+    { id: 'track-tech', group: 'SIMULATION TRACKS', title: 'Launch System & Architecture Mock', badge: 'Scalability', icon: '🏗️', action: () => onSelectAction('start-track', 'TECHNICAL') },
+    { id: 'track-java', group: 'SIMULATION TRACKS', title: 'Launch Java & Spring Deep Dive', badge: 'JVM & Concurrency', icon: '☕', action: () => onSelectAction('start-track', 'JAVA') },
+    { id: 'track-dsa', group: 'SIMULATION TRACKS', title: 'Launch DSA & Algorithmic Set', badge: 'Data Structures', icon: '⚡', action: () => onSelectAction('start-track', 'DSA') },
+    { id: 'quick-drill', group: 'QUICK ACTIONS', title: 'Launch Rapid 1-Minute Warm-up Drill', badge: 'Rapid Rehearsal', icon: '⏱️', action: () => onSelectAction('quick-drill') },
+    { id: 'resume', group: 'NAVIGATION', title: 'Resume AI Calibration & Ingestion', badge: 'Tailored AI', icon: '📄', action: () => onSelectAction('nav', 'resume') },
+    { id: 'history', group: 'NAVIGATION', title: 'View Past Session Trajectory & Scores', badge: 'Archive', icon: '📊', action: () => onSelectAction('nav', 'history') },
+    { id: 'setup', group: 'NAVIGATION', title: 'Configure Custom Practice Suite', badge: 'Settings', icon: '⚙️', action: () => onSelectAction('nav', 'setup') },
+    { id: 'toggle-sound', group: 'UTILITIES', title: 'Toggle UI Sound Effects', badge: 'Audio', icon: '🔊', action: () => onSelectAction('toggle-sound') },
+    { id: 'hotkeys', group: 'UTILITIES', title: 'View Global Keyboard Hotkeys', badge: 'Shortcuts', icon: '⌨️', action: () => onSelectAction('shortcuts') },
+  ]
+
+  const filtered = actions.filter((a) =>
+    a.title.toLowerCase().includes(search.toLowerCase()) ||
+    a.badge.toLowerCase().includes(search.toLowerCase()) ||
+    a.group.toLowerCase().includes(search.toLowerCase())
+  )
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!isOpen) return
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setSelectedIndex((prev) => (prev + 1) % (filtered.length || 1))
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setSelectedIndex((prev) => (prev - 1 + filtered.length) % (filtered.length || 1))
+      } else if (e.key === 'Enter') {
+        e.preventDefault()
+        if (filtered[selectedIndex]) {
+          filtered[selectedIndex].action()
+          onClose()
+        }
+      } else if (e.key === 'Escape') {
+        onClose()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, filtered, selectedIndex])
+
+  if (!isOpen) return null
+
+  return (
+    <div className="command-palette-backdrop" onClick={onClose}>
+      <div className="command-palette-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="command-search-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            ref={inputRef}
+            className="command-search-input"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setSelectedIndex(0) }}
+            placeholder="Type a command or track name (e.g. Java, System Design, Resume)..."
+          />
+          <span className="command-kbd-pill">ESC to close</span>
+        </div>
+
+        <div className="command-list-body">
+          {filtered.length === 0 ? (
+            <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-faint)', fontSize: 13.5 }}>
+              No commands found for "{search}"
+            </div>
+          ) : (
+            filtered.map((item, idx) => (
+              <button
+                key={item.id}
+                type="button"
+                className={`command-item-btn ${idx === selectedIndex ? 'selected' : ''}`}
+                onClick={() => {
+                  item.action()
+                  onClose()
+                }}
+                onMouseEnter={() => setSelectedIndex(idx)}
+              >
+                <div className="command-item-left">
+                  <span className="command-item-icon">{item.icon}</span>
+                  <div>
+                    <span style={{ fontWeight: 600 }}>{item.title}</span>
+                  </div>
+                </div>
+                <span className="command-item-badge">{item.badge}</span>
+              </button>
+            ))
+          )}
+        </div>
+
+        <div className="command-footer">
+          <span>Use <strong>↑</strong> <strong>↓</strong> to navigate</span>
+          <span>Press <strong>↵</strong> to select</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Global Keyboard Shortcuts Modal
 const ShortcutsModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null
@@ -486,6 +909,10 @@ const ShortcutsModal = ({ isOpen, onClose }) => {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: 8 }}>
+            <span>Command Palette / Quick Search</span>
+            <kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: 6, fontFamily: 'var(--font-mono)' }}>Ctrl + K / ⌘K</kbd>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: 8 }}>
             <span>Save & Advance to Next Question</span>
             <kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: 6, fontFamily: 'var(--font-mono)' }}>Ctrl + Enter</kbd>
           </div>
@@ -515,6 +942,7 @@ export default function App() {
   const [message, setMessage] = useState('')
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
 
   const loadDashboard = async () => {
     try {
@@ -528,9 +956,14 @@ export default function App() {
     if (token()) loadDashboard()
   }, [])
 
-  // Global key listener for '?'
+  // Global key listener for '?' and 'Ctrl+K / Cmd+K'
   useEffect(() => {
     const handleGlobalKey = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setCommandPaletteOpen((prev) => !prev)
+        return
+      }
       if (e.key === '?' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
         e.preventDefault()
         setShortcutsOpen((prev) => !prev)
@@ -594,6 +1027,22 @@ export default function App() {
     }
   }
 
+  const handleCommandAction = (type, payload) => {
+    sfx.click()
+    if (type === 'start-track') {
+      begin(payload, 'Senior Software Engineer', 3)
+    } else if (type === 'quick-drill') {
+      begin('HR', 'Software Engineer', 1)
+    } else if (type === 'nav') {
+      setPage(payload)
+    } else if (type === 'toggle-sound') {
+      toggleSound()
+      notify(`Sound effects ${!soundEnabled ? 'enabled' : 'muted'}`)
+    } else if (type === 'shortcuts') {
+      setShortcutsOpen(true)
+    }
+  }
+
   return (
     <div className="app-shell">
       <div className="bg-grid-overlay" />
@@ -609,6 +1058,11 @@ export default function App() {
       )}
 
       <ShortcutsModal isOpen={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+        onSelectAction={handleCommandAction}
+      />
 
       {user && (
         <header className="app-header">
@@ -641,6 +1095,30 @@ export default function App() {
           </nav>
 
           <div className="header-tools">
+            <button
+              type="button"
+              className="icon-action-btn"
+              onClick={() => setCommandPaletteOpen(true)}
+              title="Open Command Palette (Ctrl+K / ⌘K)"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 10px',
+                borderRadius: 8,
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid var(--border-subtle)',
+                fontSize: 12,
+                color: 'var(--text-muted)'
+              }}
+            >
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <kbd style={{ fontFamily: 'var(--font-mono)', fontSize: 10, opacity: 0.8 }}>⌘K</kbd>
+            </button>
+
             <button
               type="button"
               className="icon-action-btn"
@@ -687,6 +1165,7 @@ export default function App() {
             onResume={() => { sfx.click(); setPage('resume') }}
             onHistory={() => { sfx.click(); setPage('history') }}
             onQuickDrill={() => begin('HR', 'Software Engineer', 1)}
+            onStartCustom={begin}
           />
         )}
         {page === 'setup' && <Setup onStart={begin} />}
@@ -705,6 +1184,7 @@ export default function App() {
         {page === 'results' && interview && (
           <Results
             interview={interview}
+            user={user}
             onPractice={() => { sfx.click(); setPage('setup') }}
             notify={notify}
           />
@@ -722,13 +1202,75 @@ const PressureLine = ({ value = 38, className = '' }) => (
   </div>
 )
 
+function PasswordStrength({ password = '' }) {
+  if (!password) return null
+  let score = 0
+  if (password.length >= 8) score++
+  if (/[A-Z]/.test(password)) score++
+  if (/[0-9]/.test(password)) score++
+  if (/[^A-Za-z0-9]/.test(password)) score++
+
+  const label = score <= 1 ? 'Weak' : score <= 3 ? 'Good' : 'Strong'
+  const color = score <= 1 ? '#ef4444' : score <= 3 ? '#f59e0b' : '#10b981'
+  const width = Math.min(100, Math.max(15, (score / 4) * 100))
+
+  return (
+    <div className="pwd-strength-bar">
+      <div className="pwd-strength-track">
+        <div className="pwd-strength-fill" style={{ width: `${width}%`, backgroundColor: color }} />
+      </div>
+      <span className="pwd-strength-label" style={{ color }}>{label}</span>
+    </div>
+  )
+}
+
+function Field({ label, hint, children }) {
+  return (
+    <label className="field">
+      <div className="field-header-row">
+        <span>{label}</span>
+        {hint && <span className="field-subhint">{hint}</span>}
+      </div>
+      {children}
+    </label>
+  )
+}
+
+function PasswordField({ label = 'Password', value, onChange, placeholder = 'At least 8 characters', required = true }) {
+  const [visible, setVisible] = useState(false)
+  return (
+    <Field label={label}>
+      <div className="password-wrap">
+        <input
+          type={visible ? 'text' : 'password'}
+          required={required}
+          minLength="8"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+        />
+        <button
+          type="button"
+          className="password-toggle"
+          onClick={() => setVisible(!visible)}
+          aria-label={visible ? 'Hide password' : 'Show password'}
+        >
+          {visible ? 'Hide' : 'Show'}
+        </button>
+      </div>
+      <PasswordStrength password={value} />
+    </Field>
+  )
+}
+
 function Auth({ onSuccess }) {
   const urlParams = new URLSearchParams(window.location.search)
   const initialToken = urlParams.get('resetToken') || ''
   const initialMode = initialToken ? 'reset' : 'login'
 
   const [mode, setMode] = useState(initialMode)
-  const [form, setForm] = useState({ name: '', email: '', password: '', token: initialToken })
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', token: initialToken })
+  const [devOtp, setDevOtp] = useState('')
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [busy, setBusy] = useState(false)
@@ -781,11 +1323,15 @@ function Auth({ onSuccess }) {
     forgot = mode === 'forgot',
     reset = mode === 'reset'
   const set = (values) => setForm((prev) => ({ ...prev, ...values }))
+
   const changeMode = (next) => {
     sfx.click()
     setMode(next)
     setError('')
     setNotice('')
+    if (next === 'login' || next === 'register') {
+      setDevOtp('')
+    }
   }
 
   const triggerGithubLogin = async () => {
@@ -807,7 +1353,7 @@ function Auth({ onSuccess }) {
 
   const handleResend = async () => {
     if (!form.email?.trim()) {
-      setError('Please enter your email address to resend the code.')
+      setError('Please enter your email address to receive the verification code.')
       return
     }
     setResending(true)
@@ -819,14 +1365,17 @@ function Auth({ onSuccess }) {
         body: JSON.stringify({ email: form.email.trim() }),
       })
       if (data.developmentToken) {
+        setDevOtp(data.developmentToken)
         set({ token: data.developmentToken })
-        setNotice(`New reset code: ${data.developmentToken}`)
+        setNotice(`New 6-digit code: ${data.developmentToken}`)
       } else {
-        setNotice(data.message || 'If an account exists, a reset link/code has been sent.')
+        setNotice(data.message || 'Verification code sent to your email.')
       }
       setCooldown(30)
+      sfx.success()
     } catch (x) {
       setError(x.message)
+      sfx.warning()
     } finally {
       setResending(false)
     }
@@ -839,27 +1388,43 @@ function Auth({ onSuccess }) {
     setNotice('')
     try {
       if (forgot) {
+        if (!form.email?.trim()) {
+          throw new Error('Please enter your registered email address.')
+        }
         const data = await request('/auth/forgot-password', {
           method: 'POST',
           body: JSON.stringify({ email: form.email.trim() }),
         })
         if (data.developmentToken) {
+          setDevOtp(data.developmentToken)
           set({ token: data.developmentToken })
-          setNotice(`Reset code: ${data.developmentToken}`)
+          setNotice(`Verification code sent! (Code: ${data.developmentToken})`)
         } else {
-          setNotice(data.message || 'If an account exists, a reset link has been sent.')
+          setNotice(data.message || 'Verification code sent to your email. Please enter it below.')
         }
+        setMode('reset')
         setCooldown(30)
+        sfx.click()
       } else if (reset) {
-        if (!form.token?.trim()) {
-          throw new Error('Please enter the reset code.')
+        const cleanToken = (form.token || '').trim()
+        if (!cleanToken) {
+          throw new Error('Please enter the 6-digit verification code.')
+        }
+        if (!form.password || form.password.length < 8) {
+          throw new Error('New password must be at least 8 characters long.')
+        }
+        if (form.confirmPassword && form.password !== form.confirmPassword) {
+          throw new Error('Passwords do not match. Please re-type your new password.')
         }
         const data = await request('/auth/reset-password', {
           method: 'POST',
-          body: JSON.stringify({ token: form.token.trim(), password: form.password }),
+          body: JSON.stringify({ token: cleanToken, password: form.password }),
         })
-        setNotice(data.message || 'Password changed successfully! You can now sign in.')
+        sfx.success()
+        setNotice(data.message || 'Password reset successfully! You can now sign in.')
         setMode('login')
+        setForm((prev) => ({ ...prev, password: '', confirmPassword: '', token: '' }))
+        setDevOtp('')
       } else {
         const payload = register
           ? { name: form.name.trim(), email: form.email.trim(), password: form.password }
@@ -881,232 +1446,323 @@ function Auth({ onSuccess }) {
   const title = register
     ? 'Build your edge.'
     : forgot
-    ? 'Reset your password.'
+    ? 'Reset your password'
     : reset
-    ? 'Choose a new password.'
+    ? 'Set your new password'
     : 'Step into the arena.'
   const copy = register
     ? 'One calibrated simulation is enough to completely transform your interview poise.'
     : forgot
-    ? 'Enter your email address and we will dispatch a secure reset token.'
+    ? 'Enter your registered email and we will send a 6-digit verification code.'
     : reset
-    ? 'Provide the verification token received and configure your new password.'
+    ? 'Enter the 6-digit code received and choose your new password.'
     : 'Master technical, algorithmic & leadership rounds with real-time AI speech evaluation.'
 
   return (
-    <section className="auth">
-      <div className="auth-editorial">
-        <div className="brand">
-          <span className="brand-sigil">M</span> MOCKMATE AI
-        </div>
-        <div className="editorial-copy">
-          <span className="eyebrow">NEXT-GEN INTERVIEW SIMULATOR</span>
-          <h1>
-            Walk in ready.
-            <br />
-            <span className="text-gradient">Speak like you belong.</span>
-          </h1>
-          <p>
-            MockMate bridges the gap between preparation and authentic interview mastery with speech feedback, STAR rubric scoring, and resume calibration.
-          </p>
-          <div className="auth-highlights">
-            <span className="auth-highlight-pill">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 14 14" /></svg>
-              Live Speech-to-Text
-            </span>
-            <span className="auth-highlight-pill">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
-              STAR Rubric Scoring
-            </span>
-            <span className="auth-highlight-pill">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
-              Resume Context
-            </span>
+    <>
+      <section className="auth">
+        <div className="auth-editorial">
+          <div className="brand">
+            <span className="brand-sigil">M</span> MOCKMATE AI
           </div>
-        </div>
-        <div className="editorial-meter">
-          <span>SYSTEM READINESS SIGNAL</span>
-          <PressureLine value={78} />
-          <b>
-            78 <small>calibrated</small>
-          </b>
-        </div>
-      </div>
-
-      <form className="auth-card" onSubmit={submit}>
-        <div className="form-kicker">
-          {register
-            ? 'NEW CANDIDATE REGISTRATION'
-            : forgot
-            ? 'ACCOUNT RECOVERY'
-            : reset
-            ? 'SET CREDENTIALS'
-            : 'MEMBER SIGN IN'}
-        </div>
-        <h2>{title}</h2>
-        <p>{copy}</p>
-
-        {/* GitHub Social Login */}
-        {!forgot && !reset && (
-          <div className="oauth-button-container">
-            <button
-              type="button"
-              className="github-oauth-btn-classic"
-              onClick={triggerGithubLogin}
-              disabled={oauthLoading || busy}
-            >
-              <svg style={{ width: 18, height: 18 }} viewBox="0 0 24 24" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-                />
-              </svg>
-              <span>{oauthLoading ? 'Connecting to GitHub...' : 'Continue with GitHub'}</span>
-            </button>
-            <div className="auth-or-divider">
-              <span />
-              <span>OR EMAIL</span>
-              <span />
+          <div className="editorial-copy">
+            <span className="eyebrow">NEXT-GEN INTERVIEW SIMULATOR</span>
+            <h1>
+              Walk in ready.
+              <br />
+              <span className="text-gradient">Speak like you belong.</span>
+            </h1>
+            <p>
+              MockMate bridges the gap between preparation and authentic interview mastery with live speech feedback, STAR rubric scoring, and resume calibration.
+            </p>
+            <div className="auth-highlights">
+              <span className="auth-highlight-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 14 14" /></svg>
+                Live Speech-to-Text
+              </span>
+              <span className="auth-highlight-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                STAR Rubric Scoring
+              </span>
+              <span className="auth-highlight-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                Resume Context
+              </span>
             </div>
           </div>
-        )}
+          <div className="editorial-meter">
+            <span>SYSTEM READINESS SIGNAL</span>
+            <PressureLine value={78} />
+            <b>
+              78 <small>calibrated</small>
+            </b>
+          </div>
+        </div>
 
-        {register && (
-          <Field label="Full Name">
-            <input
-              required
-              value={form.name}
-              onChange={(e) => set({ name: e.target.value })}
-              placeholder="Alex Morgan"
-            />
-          </Field>
-        )}
-
-        <Field label="Email Address">
-          <input
-            type="email"
-            required
-            value={form.email}
-            onChange={(e) => set({ email: e.target.value })}
-            placeholder="alex@company.com"
-          />
-        </Field>
-
-        {(forgot || reset) && (
-          <div className="resend-container">
-            <span>Didn't receive the token?</span>
+        <form className="auth-card" onSubmit={submit}>
+          {/* Top Mode Selector Tabs */}
+          <div className="auth-mode-tabs">
             <button
               type="button"
-              className="resend-btn"
-              onClick={handleResend}
-              disabled={resending || busy || cooldown > 0}
+              className={`auth-mode-tab ${!register && !forgot && !reset ? 'active' : ''}`}
+              onClick={() => changeMode('login')}
             >
-              {resending ? 'Sending...' : cooldown > 0 ? `Resend (${cooldown}s)` : 'Resend code'}
+              Sign In
+            </button>
+            <button
+              type="button"
+              className={`auth-mode-tab ${register ? 'active' : ''}`}
+              onClick={() => changeMode('register')}
+            >
+              Create Account
+            </button>
+            <button
+              type="button"
+              className={`auth-mode-tab ${forgot || reset ? 'active' : ''}`}
+              onClick={() => changeMode('forgot')}
+            >
+              Reset Password
             </button>
           </div>
-        )}
 
-        {reset && (
-          <Field label="Reset Token">
-            <input
-              required
-              value={form.token}
-              onChange={(e) => set({ token: e.target.value })}
-              placeholder="Paste token from email or dev mode"
-            />
-          </Field>
-        )}
-
-        {!forgot && (
-          <PasswordField
-            value={form.password}
-            onChange={(value) => set({ password: value })}
-            label={reset ? 'New Password' : 'Password'}
-          />
-        )}
-
-        {error && <small className="error">{error}</small>}
-        {notice && <small className="notice">{notice}</small>}
-
-        <button className="primary wide" disabled={busy || resending || oauthLoading}>
-          {busy
-            ? 'Authenticating...'
-            : forgot
-            ? 'Send Recovery Token'
-            : reset
-            ? 'Save New Password'
-            : register
-            ? 'Create Free Account'
-            : 'Enter Simulation Suite'}
-          <span style={{ fontSize: 18 }}>→</span>
-        </button>
-
-        <div className="auth-actions-group">
-          {forgot && (
-            <button type="button" className="link" onClick={() => changeMode('reset')}>
-              Already have a reset code? Enter code →
-            </button>
-          )}
-          {reset && (
-            <button type="button" className="link" onClick={() => changeMode('forgot')}>
-              Request a different email reset link
-            </button>
-          )}
-          {!register && !forgot && !reset && (
-            <button type="button" className="link forgot-link" onClick={() => changeMode('forgot')}>
-              Forgot your password?
-            </button>
-          )}
-          <button type="button" className="link" onClick={() => changeMode(register ? 'login' : 'register')}>
+          <div className="form-kicker">
             {register
-              ? 'Already registered? Sign in here'
-              : forgot || reset
-              ? 'Back to sign in'
-              : "Don't have an account? Create one now"}
+              ? 'NEW CANDIDATE REGISTRATION'
+              : forgot
+              ? 'STEP 1 • REQUEST VERIFICATION CODE'
+              : reset
+              ? 'STEP 2 • VERIFY & SET NEW PASSWORD'
+              : 'MEMBER SIGN IN'}
+          </div>
+          <h2>{title}</h2>
+          <p>{copy}</p>
+
+          {/* Password Recovery Step Wizard Progress Bar */}
+          {(forgot || reset) && (
+            <div className="auth-recovery-steps">
+              <button
+                type="button"
+                className={`recovery-step-item ${forgot ? 'active' : 'completed'}`}
+                onClick={() => changeMode('forgot')}
+              >
+                <span className="step-num">{reset ? '✓' : '1'}</span>
+                <span>1. Email & Code</span>
+              </button>
+              <div className={`step-connector ${reset ? 'completed' : ''}`} />
+              <button
+                type="button"
+                className={`recovery-step-item ${reset ? 'active' : ''}`}
+                onClick={() => changeMode('reset')}
+              >
+                <span className="step-num">2</span>
+                <span>2. New Password</span>
+              </button>
+            </div>
+          )}
+
+          {/* GitHub Social Login (only in sign-in or register) */}
+          {!forgot && !reset && (
+            <div className="oauth-button-container">
+              <button
+                type="button"
+                className="github-oauth-btn-classic"
+                onClick={triggerGithubLogin}
+                disabled={oauthLoading || busy}
+              >
+                <svg style={{ width: 18, height: 18 }} viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                  />
+                </svg>
+                <span>{oauthLoading ? 'Connecting to GitHub...' : 'Continue with GitHub'}</span>
+              </button>
+              <div className="auth-or-divider">
+                <span />
+                <span>OR EMAIL</span>
+                <span />
+              </div>
+            </div>
+          )}
+
+          {register && (
+            <Field label="Full Name">
+              <input
+                required
+                value={form.name}
+                onChange={(e) => set({ name: e.target.value })}
+                placeholder="Alex Morgan"
+              />
+            </Field>
+          )}
+
+          {/* Email field - shown in login, register, forgot, or as summary in reset */}
+          {!reset && (
+            <Field label="Email Address">
+              <input
+                type="email"
+                required
+                value={form.email}
+                onChange={(e) => set({ email: e.target.value })}
+                placeholder="alex@company.com"
+                autoFocus={forgot}
+              />
+            </Field>
+          )}
+
+          {reset && (
+            <>
+              <div className="email-sent-badge">
+                <div className="email-badge-left">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                    <polyline points="22,6 12,13 2,6" />
+                  </svg>
+                  <span>Code sent to: <strong>{form.email || 'your email'}</strong></span>
+                </div>
+                <button
+                  type="button"
+                  className="change-email-btn"
+                  onClick={() => changeMode('forgot')}
+                >
+                  Change
+                </button>
+              </div>
+
+              {devOtp && (
+                <div
+                  className="dev-otp-pill-banner"
+                  onClick={() => set({ token: devOtp })}
+                  role="button"
+                  tabIndex={0}
+                  title="Click to auto-fill code"
+                >
+                  <div className="dev-otp-left">
+                    <span className="dev-otp-badge">TEST / DEV OTP</span>
+                    <span className="dev-otp-code">{devOtp}</span>
+                  </div>
+                  <span className="dev-otp-action">Click to Auto-Fill ↵</span>
+                </div>
+              )}
+
+              <Field label="6-Digit Verification Code">
+                <input
+                  required
+                  maxLength="6"
+                  className="otp-digit-input"
+                  value={form.token}
+                  onChange={(e) => {
+                    const clean = e.target.value.replace(/\D/g, '').slice(0, 6)
+                    set({ token: clean })
+                  }}
+                  placeholder="••••••"
+                  autoFocus
+                />
+              </Field>
+
+              <PasswordField
+                value={form.password}
+                onChange={(value) => set({ password: value })}
+                label="New Password"
+                placeholder="Minimum 8 characters"
+              />
+
+              <Field label="Confirm New Password">
+                <input
+                  type="password"
+                  required
+                  minLength="8"
+                  value={form.confirmPassword || ''}
+                  onChange={(e) => set({ confirmPassword: e.target.value })}
+                  placeholder="Re-enter your new password"
+                />
+                {form.password && form.confirmPassword && (
+                  <small style={{ color: form.password === form.confirmPassword ? '#10b981' : '#ef4444', marginTop: 4, display: 'block', fontSize: 12 }}>
+                    {form.password === form.confirmPassword ? '✓ Passwords match' : '✕ Passwords do not match'}
+                  </small>
+                )}
+              </Field>
+
+              <div className="resend-container">
+                <span>Didn't receive the email?</span>
+                <button
+                  type="button"
+                  className="resend-btn"
+                  onClick={handleResend}
+                  disabled={resending || busy || cooldown > 0}
+                >
+                  {resending ? 'Sending...' : cooldown > 0 ? `Resend (${cooldown}s)` : '↻ Resend code'}
+                </button>
+              </div>
+            </>
+          )}
+
+          {!forgot && !reset && (
+            <PasswordField
+              value={form.password}
+              onChange={(value) => set({ password: value })}
+              label="Password"
+            />
+          )}
+
+          {error && <div className="auth-alert error">{error}</div>}
+          {notice && <div className="auth-alert success">{notice}</div>}
+
+          <button className="primary wide" disabled={busy || resending || oauthLoading}>
+            {busy
+              ? 'Processing...'
+              : forgot
+              ? 'Send 6-Digit Code'
+              : reset
+              ? 'Save New Password & Sign In'
+              : register
+              ? 'Create Free Account'
+              : 'Sign In to MockMate'}
+            <span style={{ fontSize: 18 }}>→</span>
           </button>
-        </div>
-      </form>
-    </section>
-  )
-}
 
-function Field({ label, children }) {
-  return (
-    <label className="field">
-      <span>{label}</span>
-      {children}
-    </label>
-  )
-}
+          <div className="auth-actions-group">
+            {forgot && (
+              <button type="button" className="link" onClick={() => changeMode('reset')}>
+                Already have a verification code? Enter code →
+              </button>
+            )}
+            {!register && !forgot && !reset && (
+              <button type="button" className="link forgot-link" onClick={() => changeMode('forgot')}>
+                Forgot your password?
+              </button>
+            )}
+            <button
+              type="button"
+              className="link"
+              onClick={() => changeMode(register ? 'login' : forgot || reset ? 'login' : 'register')}
+            >
+              {register
+                ? 'Already have an account? Sign in here'
+                : forgot || reset
+                ? '← Back to sign in'
+                : "Don't have an account? Create one now"}
+            </button>
+          </div>
+        </form>
+      </section>
 
-function PasswordField({ label, value, onChange }) {
-  const [visible, setVisible] = useState(false)
-  return (
-    <Field label={label}>
-      <div className="password-wrap">
-        <input
-          type={visible ? 'text' : 'password'}
-          required
-          minLength="8"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="At least 8 characters"
+      <section className="landing-extra-section">
+        <TechTrustStrip />
+        <LandingDemoTeaser
+          onTrySample={() => {
+            sfx.click()
+            setMode('register')
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          }}
         />
-        <button
-          type="button"
-          className="password-toggle"
-          onClick={() => setVisible(!visible)}
-          aria-label={visible ? 'Hide password' : 'Show password'}
-        >
-          {visible ? 'Hide' : 'Show'}
-        </button>
-      </div>
-    </Field>
+      </section>
+    </>
   )
 }
 
-function Dashboard({ user, data, onPractice, onResume, onHistory, onQuickDrill }) {
+function Dashboard({ user, data, onPractice, onResume, onHistory, onQuickDrill, onStartCustom }) {
   const score = data?.averageScore ?? 0,
     completed = data?.completedInterviews ?? 0,
     readiness = score || 24
@@ -1216,6 +1872,12 @@ function Dashboard({ user, data, onPractice, onResume, onHistory, onQuickDrill }
         </button>
       </section>
 
+      {/* Subgrid for Competency Radar & Habit Streak */}
+      <div className="dashboard-metrics-subgrid">
+        <CompetencyRadarChart score={score} scoresByType={scoresByType} />
+        <HabitStreakCard completedCount={completed} onQuickDrill={onQuickDrill} />
+      </div>
+
       <section className="dashboard-content-layout">
         <div className="tracks-column">
           <div className="column-header">
@@ -1290,6 +1952,9 @@ function Dashboard({ user, data, onPractice, onResume, onHistory, onQuickDrill }
           </div>
         </aside>
       </section>
+
+      {/* Target Company Prep Archetypes */}
+      <CompanyPrepPacks onSelectPack={onStartCustom || onPractice} />
     </div>
   )
 }
@@ -1526,6 +2191,8 @@ function InterviewRoom({ interview, onComplete, notify }) {
   const [session, setSession] = useState(interview)
   const [index, setIndex] = useState(0)
   const [answer, setAnswer] = useState('')
+  const [codeAnswer, setCodeAnswer] = useState('')
+  const [editorMode, setEditorMode] = useState('verbal')
   const [loading, setLoading] = useState(false)
   const [recording, setRecording] = useState(false)
   const [speaking, setSpeaking] = useState(false)
@@ -1573,12 +2240,16 @@ function InterviewRoom({ interview, onComplete, notify }) {
   }, [timerRunning, timeLeft])
 
   const save = async (thenNext) => {
-    if (!answer.trim()) return notify('Please write or dictate an answer first.')
+    const combined = codeAnswer.trim()
+      ? `${answer.trim()}\n\n[Architecture / Code Solution]:\n\`\`\`\n${codeAnswer.trim()}\n\`\`\``
+      : answer.trim()
+
+    if (!combined) return notify('Please write or dictate an answer first.')
     setLoading(true)
     try {
       const updated = await request(`/interviews/${session.id}/questions/${question.id}/answer`, {
         method: 'POST',
-        body: JSON.stringify({ answer }),
+        body: JSON.stringify({ answer: combined }),
       })
       sfx.success()
       const questions = [...session.questions]
@@ -1587,8 +2258,10 @@ function InterviewRoom({ interview, onComplete, notify }) {
       if (thenNext) {
         setIndex(index + 1)
         setAnswer(questions[index + 1]?.answer || '')
+        setCodeAnswer('')
+        setEditorMode('verbal')
       } else {
-        notify('Answer evaluated & saved!')
+        notify('Answer evaluated & calibrated!')
       }
     } catch (e) {
       notify(e.message)
@@ -1600,7 +2273,7 @@ function InterviewRoom({ interview, onComplete, notify }) {
 
   const finish = async () => {
     try {
-      if (question.score == null && answer.trim()) await save(false)
+      if (question.score == null && (answer.trim() || codeAnswer.trim())) await save(false)
       const done = await request(`/interviews/${session.id}/complete`, { method: 'POST' })
       sfx.success()
       setSession(done)
@@ -1671,6 +2344,26 @@ function InterviewRoom({ interview, onComplete, notify }) {
     }
   }
 
+  const handleCodeKeyDown = (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      const { selectionStart, selectionEnd } = e.target
+      const next = codeAnswer.substring(0, selectionStart) + '  ' + codeAnswer.substring(selectionEnd)
+      setCodeAnswer(next)
+      setTimeout(() => {
+        e.target.selectionStart = e.target.selectionEnd = selectionStart + 2
+      }, 0)
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault()
+      if (index === session.questions.length - 1) {
+        finish()
+      } else {
+        save(true)
+      }
+    }
+  }
+
   // Global hotkeys in interview room
   useEffect(() => {
     const handleInterviewHotkeys = (e) => {
@@ -1694,6 +2387,23 @@ function InterviewRoom({ interview, onComplete, notify }) {
   }
 
   const wordCount = answer.trim().split(/\s+/).filter(Boolean).length
+
+  const getStarProTip = () => {
+    if (!answer.trim()) return null
+    const lower = answer.toLowerCase()
+    const hasS = /(when|while working|at my previous|in a project|background|scenario|we had a problem|situation|faced with)/i.test(lower)
+    const hasT = /(my goal|responsible for|needed to|objective|task was|aimed to|requirement was|challenge was)/i.test(lower)
+    const hasA = /(i implemented|we built|designed|created|refactored|developed|optimized|executed|wrote|utilized|applied)/i.test(lower)
+    const hasR = /(resulted in|improved by|reduced|increased|throughput|latency|metrics|successfully|boosted|achieved|saved|percent|%)/i.test(lower)
+
+    if (!hasS) return '💡 Context Tip: Open with your Situation ("While architecting our checkout backend...")'
+    if (!hasT) return '💡 Objective Tip: State your core Task ("My primary objective was to eliminate 504 gateway timeouts...")'
+    if (!hasA) return '💡 Action Tip: Detail your specific implementation ("I implemented Redis sliding window rate limiting and...")'
+    if (!hasR) return '💡 Impact Tip: Quantify your Result ("This reduced P99 latency by 45% and scaled to 100k req/s.")'
+    return '✨ Excellent STAR structural balance detected!'
+  }
+
+  const starTip = getStarProTip()
 
   return (
     <section className="interview-hud">
@@ -1801,7 +2511,7 @@ function InterviewRoom({ interview, onComplete, notify }) {
 
           <h1>{question.question}</h1>
           <p className="q-coach-hint">
-            💡 <strong>AI Tip:</strong> Structure your answer clearly. State your primary technical judgment first, then walk through implementation details and trade-offs.
+            💡 <strong>AI Tip:</strong> State your core technical judgment or thesis first, then support with architectural mechanics and trade-offs.
           </p>
         </div>
 
@@ -1830,43 +2540,103 @@ function InterviewRoom({ interview, onComplete, notify }) {
 
         {/* Live STAR Structure Checker */}
         <StarDetector text={answer} />
+        {starTip && (
+          <div style={{
+            fontSize: 12.5,
+            color: starTip.startsWith('✨') ? 'var(--accent-emerald)' : 'var(--accent-cyan)',
+            background: 'rgba(255,255,255,0.03)',
+            padding: '6px 14px',
+            borderRadius: 8,
+            border: '1px solid rgba(255,255,255,0.06)'
+          }}>
+            {starTip}
+          </div>
+        )}
 
-        <div className="answer-editor-card">
-          <textarea
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Articulate your solution here. Open with your main thesis, support with evidence, and close with metrics... (Press Ctrl+Enter to submit)"
-            rows={7}
-          />
-          <div className="editor-bottom-bar">
-            <div className="editor-hints">
-              <span className="word-count-badge">
-                {wordCount} words {wordCount < 40 ? '(Brief)' : wordCount <= 220 ? '(Optimal Depth)' : '(Comprehensive)'}
-              </span>
-              <span className="shortcut-hint">Press <strong>Ctrl+Enter</strong> to save</span>
-            </div>
-            <div className="editor-buttons">
-              {index === session.questions.length - 1 ? (
-                <button className="primary-glow-btn" onClick={finish} disabled={loading}>
-                  <span>{loading ? 'Evaluating...' : 'Finish & Complete Set'}</span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: 16, height: 16 }}>
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                    <polyline points="12 5 19 12 12 19" />
-                  </svg>
-                </button>
-              ) : (
-                <button className="primary-glow-btn" disabled={loading} onClick={() => save(true)}>
-                  <span>{loading ? 'Evaluating...' : 'Save & Next Question'}</span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: 16, height: 16 }}>
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                    <polyline points="12 5 19 12 12 19" />
-                  </svg>
-                </button>
-              )}
+        {/* Dual Mode Switcher: Verbal vs Code / Architecture Scratchpad */}
+        <div className="interview-mode-switch-bar">
+          <div className="mode-tab-group">
+            <button
+              type="button"
+              className={`mode-tab-btn ${editorMode === 'verbal' ? 'active' : ''}`}
+              onClick={() => { sfx.click(); setEditorMode('verbal') }}
+            >
+              <span>💬 Verbal & Spoken Response</span>
+            </button>
+            <button
+              type="button"
+              className={`mode-tab-btn ${editorMode === 'code' ? 'active' : ''}`}
+              onClick={() => { sfx.click(); setEditorMode('code') }}
+            >
+              <span>💻 Code & Architecture Scratchpad</span>
+            </button>
+          </div>
+          <span style={{ fontSize: 11.5, color: 'var(--text-faint)', fontFamily: 'var(--font-mono)' }}>
+            {editorMode === 'code' ? 'Tab inserts 2 spaces' : 'Press Ctrl+Enter to submit'}
+          </span>
+        </div>
+
+        {editorMode === 'verbal' ? (
+          <div className="answer-editor-card">
+            <textarea
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Articulate your solution here. Open with your main thesis, support with evidence, and close with metrics... (Press Ctrl+Enter to submit)"
+              rows={7}
+            />
+            <div className="editor-bottom-bar">
+              <div className="editor-hints">
+                <span className="word-count-badge">
+                  {wordCount} words {wordCount < 40 ? '(Brief)' : wordCount <= 220 ? '(Optimal Depth)' : '(Comprehensive)'}
+                </span>
+                <span className="shortcut-hint">Press <strong>Ctrl+Enter</strong> to save</span>
+              </div>
+              <div className="editor-buttons">
+                {index === session.questions.length - 1 ? (
+                  <button className="primary-glow-btn" onClick={finish} disabled={loading}>
+                    <span>{loading ? 'Evaluating...' : 'Finish & Complete Set'}</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: 16, height: 16 }}>
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                      <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                  </button>
+                ) : (
+                  <button className="primary-glow-btn" disabled={loading} onClick={() => save(true)}>
+                    <span>{loading ? 'Evaluating...' : 'Save & Next Question'}</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: 16, height: 16 }}>
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                      <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="code-editor-wrap">
+            <div className="code-editor-topbar">
+              <span>TECHNICAL SCRATCHPAD / MONOSPACE IDE</span>
+              <span>Tab = 2 spaces</span>
+            </div>
+            <textarea
+              className="code-textarea-mono"
+              value={codeAnswer}
+              onChange={(e) => setCodeAnswer(e.target.value)}
+              onKeyDown={handleCodeKeyDown}
+              placeholder={`// Write your code snippet, algorithmic implementation, or architecture blueprint...\n\npublic class Solution {\n  public void execute() {\n    // Implementation here\n  }\n}`}
+              rows={8}
+            />
+            <div className="editor-bottom-bar" style={{ background: 'rgba(255,255,255,0.02)', padding: '12px 18px' }}>
+              <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                Code snippet will be automatically attached to your question submission.
+              </span>
+              <button className="primary-glow-btn" disabled={loading} onClick={() => save(true)}>
+                <span>{loading ? 'Evaluating...' : 'Save Answer'}</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {question.feedback && (
           <div className="ai-feedback-panel">
@@ -1897,9 +2667,15 @@ function InterviewRoom({ interview, onComplete, notify }) {
   )
 }
 
-function Results({ interview, onPractice, notify }) {
+function Results({ interview, user, onPractice, notify }) {
   const score = interview.score ?? 0
   const isTopScore = score >= 80
+  const candidateName = user?.name || 'Engineering Candidate'
+  const tierLevel = score >= 85
+    ? 'L5 Senior Engineer Hiring Bar Cleared'
+    : score >= 70
+    ? 'L4 Competent Mid-Level Calibration'
+    : 'L3 Foundational Practice Required'
 
   const handlePrint = () => {
     sfx.click()
@@ -1907,20 +2683,37 @@ function Results({ interview, onPractice, notify }) {
   }
 
   const copyFeedback = () => {
-    const summary = `MockMate Simulation Report\nRole: ${interview.targetRole}\nTrack: ${interview.type}\nFinal Score: ${score}/100\nAnalysis: ${interview.weaknessAnalysis || ''}`
+    const summary = `🏆 MockMate Simulation Performance Report\nCandidate: ${candidateName}\nRole: ${interview.targetRole}\nTrack: ${interview.type}\nScore: ${score}/100 (${tierLevel})\nAnalysis: ${interview.weaknessAnalysis || 'Calibrated under realistic AI rubric'}\n\nRehearse yours at MockMate AI.`
     navigator.clipboard?.writeText(summary)
     sfx.success()
-    notify('Report summary copied to clipboard!')
+    notify('Executive summary card copied to clipboard!')
   }
 
   return (
     <section className="results-container">
       {isTopScore && <ConfettiCanvas />}
-      
+
       <div className="results-header no-print">
         <span className="subhead-pill">EVALUATION SUMMARY</span>
         <h1>Simulation Report</h1>
         <p>Comprehensive rubric performance report and recommendations for your next technical round.</p>
+      </div>
+
+      {/* Executive Calibration Banner */}
+      <div className="executive-cert-banner">
+        <div className="cert-left-meta">
+          <div className="cert-seal-badge">🎖️</div>
+          <div className="cert-meta-text">
+            <h3>{tierLevel}</h3>
+            <p>Candidate: <strong>{candidateName}</strong> • {interview.targetRole} ({interview.type} Track)</p>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <span className="live-ticker-badge">
+            <span className="live-ticker-dot" />
+            <span>Top {score >= 85 ? '10%' : score >= 70 ? '25%' : '50%'} of MockMate Cohort</span>
+          </span>
+        </div>
       </div>
 
       <div className="results-grand-card">
@@ -1980,7 +2773,7 @@ function Results({ interview, onPractice, notify }) {
             <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
             <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
           </svg>
-          <span>Copy Summary</span>
+          <span>Copy Shareable Card</span>
         </button>
         <button className="secondary-glow-btn" onClick={handlePrint}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 16, height: 16 }}>

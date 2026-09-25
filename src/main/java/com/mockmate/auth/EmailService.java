@@ -48,11 +48,11 @@ public class EmailService {
 
   public void sendPasswordResetEmail(String toEmail, String token) {
     String resetLink = frontendUrl + (frontendUrl.contains("?") ? "&" : "?") + "resetToken=" + token;
-    String subject = "MockMate Security: Reset your password";
+    String subject = "MockMate Verification: " + token + " is your password reset code";
     String htmlContent = buildResetHtml(token, resetLink);
     String textContent = "MockMate Security Verification\n\n"
-        + "Your password reset code is: " + token + "\n\n"
-        + "Or click the link below to reset your password:\n" + resetLink + "\n\n"
+        + "Your 6-digit password reset code is: " + token + "\n\n"
+        + "Or click the direct reset link below:\n" + resetLink + "\n\n"
         + "This code is valid for 30 minutes. If you did not request this, please ignore this email.";
 
     // 1. Try Resend REST API if RESEND_API_KEY is provided
@@ -129,23 +129,23 @@ public class EmailService {
     return "<!DOCTYPE html>"
         + "<html>"
         + "<head><meta charset='UTF-8'></head>"
-        + "<body style='font-family: Arial, sans-serif; background-color: #0b0f10; color: #edf5f1; padding: 30px; margin: 0;'>"
-        + "<div style='max-width: 540px; margin: 0 auto; background-color: #101718; border: 1px solid #273638; border-radius: 8px; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);'>"
+        + "<body style='font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif; background-color: #080912; color: #f8fafc; padding: 30px; margin: 0;'>"
+        + "<div style='max-width: 520px; margin: 0 auto; background-color: #0f1322; border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 36px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);'>"
         + "  <div style='display: flex; align-items: center; margin-bottom: 24px;'>"
-        + "    <div style='background-color: #25a87d; color: #ffffff; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: bold; font-size: 18px; margin-right: 12px;'>M</div>"
-        + "    <h2 style='margin: 0; color: #f0f4f2; font-size: 20px; letter-spacing: 1px;'>MOCKMATE</h2>"
+        + "    <div style='background: linear-gradient(135deg, #8b5cf6, #ec4899); color: #ffffff; width: 36px; height: 36px; border-radius: 10px; text-align: center; line-height: 36px; font-weight: bold; font-size: 18px; margin-right: 12px;'>M</div>"
+        + "    <h2 style='margin: 0; color: #ffffff; font-size: 20px; letter-spacing: 1px;'>MOCKMATE AI</h2>"
         + "  </div>"
-        + "  <h3 style='color: #25a87d; margin-top: 0;'>Password Reset Verification</h3>"
-        + "  <p style='color: #aebdba; font-size: 14px; line-height: 1.6;'>We received a request to reset your MockMate password. Use the security code below to complete the verification:</p>"
-        + "  <div style='background-color: #15282a; border: 1px dashed #25a87d; border-radius: 6px; padding: 18px; text-align: center; margin: 24px 0;'>"
-        + "    <div style='color: #aebdba; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px;'>Your Security Code</div>"
-        + "    <div style='font-family: monospace; font-size: 15px; font-weight: bold; color: #54c99f; word-break: break-all;'>" + token + "</div>"
+        + "  <h3 style='color: #8b5cf6; margin-top: 0; font-size: 18px;'>Password Reset Verification Code</h3>"
+        + "  <p style='color: #94a3b8; font-size: 14px; line-height: 1.6;'>We received a request to reset your MockMate password. Enter this 6-digit verification code to choose a new password:</p>"
+        + "  <div style='background-color: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 12px; padding: 22px; text-align: center; margin: 24px 0;'>"
+        + "    <div style='color: #a78bfa; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; font-weight: bold;'>Your 6-Digit OTP Code</div>"
+        + "    <div style='font-family: \"DM Mono\", monospace, monospace; font-size: 34px; font-weight: 800; color: #38bdf8; letter-spacing: 8px;'>" + token + "</div>"
         + "  </div>"
-        + "  <div style='text-align: center; margin: 28px 0;'>"
-        + "    <a href='" + resetLink + "' style='background-color: #1d6b5a; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; display: inline-block;'>Reset Password Directly &rarr;</a>"
+        + "  <div style='text-align: center; margin: 26px 0;'>"
+        + "    <a href='" + resetLink + "' style='background: linear-gradient(135deg, #8b5cf6, #6366f1); color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 14px; display: inline-block;'>Reset Password Directly &rarr;</a>"
         + "  </div>"
-        + "  <p style='color: #7b8e8b; font-size: 12px; line-height: 1.5; margin-top: 24px; border-top: 1px solid #273638; padding-top: 16px;'>"
-        + "    This link and code will expire in <strong>30 minutes</strong>. If you did not request a password reset, you can safely ignore this email; your account remains secure."
+        + "  <p style='color: #64748b; font-size: 12px; line-height: 1.5; margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;'>"
+        + "    This code is valid for <strong>30 minutes</strong>. If you did not request a password reset, you can safely ignore this email; your account remains secure."
         + "  </p>"
         + "</div>"
         + "</body>"

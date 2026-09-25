@@ -252,3 +252,63 @@ html {
   pointer-events: none;
   z-index: 0;
 }
+
+/* Elevated Glass Cards */
+.glass-card-elevated {
+  background: var(--bg-card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 20px 45px -12px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(139, 92, 246, 0.1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-elevated:hover {
+  border-color: var(--border-light);
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+    0 24px 50px -10px rgba(0, 0, 0, 0.7),
+    0 0 35px rgba(139, 92, 246, 0.2);
+}
+
+/* Skeleton Loading Shimmer */
+@keyframes skeletonPulse {
+  0% {
+    background-color: rgba(255, 255, 255, 0.04);
+  }
+  50% {
+    background-color: rgba(255, 255, 255, 0.09);
+  }
+  100% {
+    background-color: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.skeleton-box {
+  animation: skeletonPulse 1.6s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+.skeleton-line {
+  height: 14px;
+  animation: skeletonPulse 1.6s ease-in-out infinite;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+/* Command Palette Backdrop Animation */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
